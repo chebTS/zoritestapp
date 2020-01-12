@@ -1,23 +1,24 @@
 package space.zori.testapp
 
+import android.R.attr.label
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
+import android.content.*
+import android.content.ClipData
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
+
 
 class MainActivity : AppCompatActivity() {
 
     private var mBtAdapter: BluetoothAdapter? = null
 
     private var mNewDevicesArrayAdapter: ArrayAdapter<String>? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,11 +43,13 @@ class MainActivity : AppCompatActivity() {
         val pairedListView = findViewById<ListView>(R.id.paired_devices)
         pairedListView.adapter = pairedDevicesArrayAdapter
         pairedListView.onItemClickListener = mDeviceClickListener
+        pairedListView.onItemLongClickListener = mDeviceLongClickListener
 
         // Find and set up the ListView for newly discovered devices
         val newDevicesListView = findViewById<ListView>(R.id.new_devices)
         newDevicesListView.adapter = mNewDevicesArrayAdapter
         newDevicesListView.onItemClickListener = mDeviceClickListener
+        newDevicesListView.onItemLongClickListener = mDeviceLongClickListener
 
         // Register for broadcasts when a device is discovered
         var filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
@@ -106,6 +109,22 @@ class MainActivity : AppCompatActivity() {
 
         // Request discover from BluetoothAdapter
         mBtAdapter!!.startDiscovery()
+    }
+
+
+    private val mDeviceLongClickListener = AdapterView.OnItemLongClickListener { parent, v, position, id ->
+        mBtAdapter!!.cancelDiscovery()
+
+        val info = (v as TextView).text.toString()
+
+        val clipboard =
+            getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("Zori", info)
+        clipboard.setPrimaryClip(clip)
+        Toast.makeText(this, "Text Copied", Toast.LENGTH_SHORT).show()
+
+
+        true
     }
 
     /**
