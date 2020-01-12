@@ -1,6 +1,5 @@
 package space.zori.testapp
 
-import android.R.attr.label
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -18,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     private var mBtAdapter: BluetoothAdapter? = null
 
     private var mNewDevicesArrayAdapter: ArrayAdapter<BluetoothDevice>? = null
-
+    lateinit var scanButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         setResult(Activity.RESULT_CANCELED)
 
         // Initialize the button to perform device discovery
-        val scanButton = findViewById<Button>(R.id.button_scan)
+        scanButton = findViewById(R.id.button_scan)
         scanButton.setOnClickListener { v ->
             doDiscovery()
             v.visibility = View.GONE
@@ -67,6 +66,7 @@ class MainActivity : AppCompatActivity() {
         // Get the local Bluetooth adapter
         mBtAdapter = BluetoothAdapter.getDefaultAdapter()
 
+
         // Get a set of currently paired devices
         val pairedDevices = mBtAdapter!!.bondedDevices
 
@@ -103,6 +103,7 @@ class MainActivity : AppCompatActivity() {
 
         // Indicate scanning in the title
         setProgressBarIndeterminateVisibility(true)
+        mNewDevicesArrayAdapter?.clear()
         setTitle(R.string.scanning)
 
         // Turn on sub-title for new devices
@@ -181,6 +182,7 @@ class MainActivity : AppCompatActivity() {
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED == action) {
                 setProgressBarIndeterminateVisibility(false)
                 setTitle(R.string.select_device)
+                scanButton.visibility = View.VISIBLE
                 if (mNewDevicesArrayAdapter!!.count == 0) {
                     val noDevices = resources.getText(R.string.none_found).toString()
                     //mNewDevicesArrayAdapter!!.add(noDevices)
@@ -195,7 +197,7 @@ class MainActivity : AppCompatActivity() {
         /**
          * Tag for Log
          */
-        private val TAG = "DeviceListActivity"
+        private val TAG = "MainActivity"
 
         /**
          * Return Intent extra
