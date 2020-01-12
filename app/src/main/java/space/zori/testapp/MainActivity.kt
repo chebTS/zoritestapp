@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
     private var mBtAdapter: BluetoothAdapter? = null
 
-    private var mNewDevicesArrayAdapter: ArrayAdapter<String>? = null
+    private var mNewDevicesArrayAdapter: ArrayAdapter<BluetoothDevice>? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +36,13 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize array adapters. One for already paired devices and
         // one for newly discovered devices
-        val pairedDevicesArrayAdapter = ArrayAdapter<String>(this, R.layout.device_name)
-        mNewDevicesArrayAdapter = ArrayAdapter<String>(this, R.layout.device_name)
+/*
+        val pairedDevicesArrayAdapter = ArrayAdapter<BluetoothDevice>(this, R.layout.device_name)
+        mNewDevicesArrayAdapter = ArrayAdapter<BluetoothDevice>(this, R.layout.device_name)
+*/
+
+        val pairedDevicesArrayAdapter = DeviceAdapter(this, R.layout.device_name, R.id.txtDevice, mutableListOf())
+        mNewDevicesArrayAdapter = DeviceAdapter(this, R.layout.device_name, R.id.txtDevice, mutableListOf())
 
         // Find and set up the ListView for paired devices
         val pairedListView = findViewById<ListView>(R.id.paired_devices)
@@ -69,11 +74,12 @@ class MainActivity : AppCompatActivity() {
         if (pairedDevices.size > 0) {
             findViewById<TextView>(R.id.title_paired_devices).visibility = View.VISIBLE
             for (device in pairedDevices) {
-                pairedDevicesArrayAdapter.add(device.name + "\n" + device.address)
+                //pairedDevicesArrayAdapter.add(device.name + "\n" + device.address)
+                pairedDevicesArrayAdapter.add(device)
             }
         } else {
             val noDevices = resources.getText(R.string.none_paired).toString()
-            pairedDevicesArrayAdapter.add(noDevices)
+            //pairedDevicesArrayAdapter.add(noDevices)
         }
     }
 
@@ -131,7 +137,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * The on-click listener for all devices in the ListViews
      */
-    private val mDeviceClickListener = AdapterView.OnItemClickListener { av, v, arg2, arg3 ->
+    private val mDeviceClickListener = AdapterView.OnItemClickListener { av, v, pos, arg3 ->
         // Cancel discovery because it's costly and we're about to connect
         mBtAdapter!!.cancelDiscovery()
 
@@ -140,9 +146,9 @@ class MainActivity : AppCompatActivity() {
         val address = info.substring(info.length - 17)
 
         // Create the result Intent and include the MAC address
-
+        val device = av.getItemAtPosition(pos) as BluetoothDevice
         val intent = Intent(this, DeviceInfoActivity::class.java)
-        //intent.putExtra("Device", )
+        intent.putExtra(DeviceInfoActivity.EXTRA_DEVICE, device)
         startActivity(intent)
 
         // Set result and finish this Activity
@@ -168,7 +174,8 @@ class MainActivity : AppCompatActivity() {
                     intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                 // If it's already paired, skip it, because it's been listed already
                 if (device.bondState != BluetoothDevice.BOND_BONDED) {
-                    mNewDevicesArrayAdapter!!.add(device.name + "\n" + device.address)
+                    //mNewDevicesArrayAdapter!!.add(device.name + "\n" + device.address)
+                    mNewDevicesArrayAdapter!!.add(device)
                 }
                 // When discovery is finished, change the Activity title
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED == action) {
@@ -176,7 +183,8 @@ class MainActivity : AppCompatActivity() {
                 setTitle(R.string.select_device)
                 if (mNewDevicesArrayAdapter!!.count == 0) {
                     val noDevices = resources.getText(R.string.none_found).toString()
-                    mNewDevicesArrayAdapter!!.add(noDevices)
+                    //mNewDevicesArrayAdapter!!.add(noDevices)
+                    //mNewDevicesArrayAdapter!!.add(noDevices)
                 }
             }
         }
