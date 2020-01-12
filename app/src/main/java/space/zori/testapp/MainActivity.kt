@@ -112,20 +112,21 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private val mDeviceLongClickListener = AdapterView.OnItemLongClickListener { parent, v, position, id ->
-        mBtAdapter!!.cancelDiscovery()
+    private val mDeviceLongClickListener =
+        AdapterView.OnItemLongClickListener { parent, v, position, id ->
+            mBtAdapter!!.cancelDiscovery()
 
-        val info = (v as TextView).text.toString()
+            val info = (v as TextView).text.toString()
 
-        val clipboard =
-            getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("Zori", info)
-        clipboard.setPrimaryClip(clip)
-        Toast.makeText(this, "Text Copied", Toast.LENGTH_SHORT).show()
+            val clipboard =
+                getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip = ClipData.newPlainText("Zori", info)
+            clipboard.setPrimaryClip(clip)
+            Toast.makeText(this, "Text Copied", Toast.LENGTH_SHORT).show()
 
 
-        true
-    }
+            true
+        }
 
     /**
      * The on-click listener for all devices in the ListViews
@@ -139,12 +140,17 @@ class MainActivity : AppCompatActivity() {
         val address = info.substring(info.length - 17)
 
         // Create the result Intent and include the MAC address
-        val intent = Intent()
-        intent.putExtra(EXTRA_DEVICE_ADDRESS, address)
+
+        val intent = Intent(this, DeviceInfoActivity::class.java)
+        //intent.putExtra("Device", )
+        startActivity(intent)
 
         // Set result and finish this Activity
+        /*
+        val intent = Intent()
+        intent.putExtra(EXTRA_DEVICE_ADDRESS, address)
         setResult(Activity.RESULT_OK, intent)
-        finish()
+        finish()*/
     }
 
     /**
@@ -158,7 +164,8 @@ class MainActivity : AppCompatActivity() {
             // When discovery finds a device
             if (BluetoothDevice.ACTION_FOUND == action) {
                 // Get the BluetoothDevice object from the Intent
-                val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                val device =
+                    intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                 // If it's already paired, skip it, because it's been listed already
                 if (device.bondState != BluetoothDevice.BOND_BONDED) {
                     mNewDevicesArrayAdapter!!.add(device.name + "\n" + device.address)

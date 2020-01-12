@@ -6,4 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".DeviceInfoActivity">
 
+    <TextView
+        android:text="Device info"
+        android:gravity="center"
+        android:textSize="26sp"
+        android:padding="8dp"
+        android:textStyle="bold"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
